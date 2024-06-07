@@ -4,9 +4,9 @@ import ListView from "@/components/views/ListView";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col md:min-h-screen">
-      <div className="grid grid-cols-3 max-w-[1280px] mx-auto gap-2 px-2 sticky">
+      <div className="grid grid-cols-3 max-w-[1280px] mx-auto gap-2 px-2 sticky md:h-screen">
         <ListView className="col-span-1 max-w-full w-screen md:overflow-auto"></ListView>
-        <CaseForm className="col-span-2 max-w-full w-screen md:min-h-screen md:sticky"></CaseForm>
+        <CaseForm className="col-span-2 max-w-full w-screen md:h-screen md:sticky md:overflow-auto"></CaseForm>
       </div>
     </main>
   );

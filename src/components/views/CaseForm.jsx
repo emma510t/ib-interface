@@ -7,6 +7,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseclient";
 
 export default function CaseForm({ className }) {
   const {
@@ -16,11 +18,51 @@ export default function CaseForm({ className }) {
     formState: { errors },
   } = useForm();
 
+  const [submitting, setSubmitting] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (formSubmitted) {
+      window.scrollTo(0, 0);
+    }
+  }, [formSubmitted]);
+
+  const onSubmit = async (data) => {
+    try {
+      setSubmitting(true); // Set submitting state to true
+
+      // Send form data to SupaBase
+      const { data: formData, error } = await supabase.from("ib-cases_v2").insert([
+        {
+          h1: data.virksomhed,
+          situation_udfordringer: data.situation,
+          slug: data.url,
+          intro: data.intro,
+          fase_1_headline: data.titel1,
+          fase_1_text: data.desc1,
+          fase_2_headline: data.titel2,
+          fase_2_text: data.desc2,
+          fase_3_headline: data.titel3,
+          fase_3_text: data.desc3,
+        },
+      ]);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error submitting form data:", error.message);
+    } finally {
+      setSubmitting(false);
+      setFormSubmitted(true); // Reset submitting state
+    }
+  };
+
   return (
     <section className={`p-4 ${className}`}>
       <h2>CaseForm</h2>
       <Form>
-        <form action="" className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit(onSubmit)} action="" className="flex flex-col gap-5">
           <div className="w-full">
             <Label htmlFor="virksomhed">Virksomhed*</Label>
             <Input
@@ -30,6 +72,26 @@ export default function CaseForm({ className }) {
               className={`mt-1.5 ${errors.virksomhed ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
             {errors.virksomhed?.type === "required" && <FormError>Indtast virksomhedens navn</FormError>}
+          </div>
+          <div className="w-full">
+            <Label htmlFor="url">Url*</Label>
+            <Input
+              id="url"
+              {...register("url", { required: true })}
+              aria-invalid={errors.url ? "true" : "false"}
+              className={`mt-1.5 ${errors.url ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+            />
+            {errors.url?.type === "required" && <FormError>Indtast stig til siden</FormError>}
+          </div>
+          <div className="w-full">
+            <Label htmlFor="intro">Intro tekst*</Label>
+            <Textarea
+              id="intro"
+              {...register("intro", { required: true })}
+              aria-invalid={errors.intro ? "true" : "false"}
+              className={`mt-1.5 ${errors.intro ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+            />
+            {errors.intro?.type === "required" && <FormError>Indset introtekst til forsiden</FormError>}
           </div>
           <div className="w-full">
             <Label htmlFor="situation">Situation og udfordinger*</Label>
@@ -101,9 +163,12 @@ export default function CaseForm({ className }) {
             />
             {errors.desc3?.type === "required" && <FormError>Beskriv fase 3</FormError>}
           </div>
+          <div></div>
           <div className="flex justify-between">
-            <Button variant="destructive">Slet</Button>
-            <Button>Udgiv/opdater</Button>
+            <Button disabled={submitting} variant="destructive">
+              Slet
+            </Button>
+            <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Udgiv/opdater"}</Button>
           </div>
         </form>
       </Form>
