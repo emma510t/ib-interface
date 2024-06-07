@@ -2,10 +2,8 @@ import { supabase } from "@/lib/supabaseclient";
 import CaseList from "../ui/caseList";
 import { Button } from "../ui/button";
 
-export default async function ListView() {
-  const { data, error } = await supabase
-    .from("ib-product-cards_v2")
-    .select("*");
+export default async function ListView({ className }) {
+  const { data, error } = await supabase.from("ib-product-cards_v2").select("*");
 
   if (error || !data || data.length === 0) {
     // Handle the error case (e.g., return a 404 page or a different component)
@@ -15,7 +13,7 @@ export default async function ListView() {
   const productCards = data;
 
   return (
-    <section className="border-r-2 border-r-ibsilver-400 border-solid">
+    <section className={`border-r-2 border-r-ibsilver-400 border-solid ${className}`}>
       <h2 className="bold text-xl">ListView</h2>
       <ul>
         {productCards.map((card) => (
