@@ -61,6 +61,16 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
   //     .eq("id", id);
   // };
 
+  const handleDelete = async () => {
+    console.log("slet denne", selectedPage.id);
+    await supabase
+      .from("ib-cases_v2")
+      .delete()
+      .eq("id", selectedPage.id)
+      .single();
+    setSelectedPage({ id: "", type: "" });
+  };
+
   return (
     <>
       {productCards.map((card) => (
@@ -86,7 +96,9 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction>Bekræft</AlertDialogAction>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Bekræft
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
