@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
 import CaseList from "../ui/caseList";
 import { Button } from "../ui/button";
@@ -15,17 +16,44 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default async function ListView({ className }) {
+async function fetchData() {
   const { data, error } = await supabase
     .from("ib-product-cards_v2")
     .select("*");
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
 
-  if (error || !data || data.length === 0) {
-    // Handle the error case (e.g., return a 404 page or a different component)
-    return <div>Error: Data not found</div>;
+export default function ListView({ className, setSelectedPage, selectedPage }) {
+  const [productCards, setProductCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchData()
+      .then((data) => {
+        setProductCards(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  const productCards = data;
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (productCards.length === 0) {
+    return <div>No data found</div>;
+  }
 
   return (
     <section
@@ -63,13 +91,20 @@ export default async function ListView({ className }) {
               <Button
                 size="icon"
                 className="bg-transparent hover:bg-transparent"
+                onClick={() => {
+                  setSelectedPage({ id: card.id, type: "ydelse" });
+                  console.log(selectedPage);
+                }}
               >
                 <Pencil className="stroke-ibsilver-600" />
               </Button>
             </div>
           </li>
         ))}
-        <CaseList />
+        <CaseList
+          setSelectedPage={setSelectedPage}
+          selectedPage={selectedPage}
+        />
       </ul>
     </section>
   );
