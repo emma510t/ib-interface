@@ -5,7 +5,9 @@ import CaseList from "../ui/caseList";
 import ProductList from "../ui/productList";
 
 async function fetchData() {
-  const { data, error } = await supabase.from("ib-product-cards_v2").select("*");
+  const { data, error } = await supabase
+    .from("ib-product-cards_v2")
+    .select("*");
   if (error) {
     throw new Error(error.message);
   }
@@ -42,11 +44,19 @@ export default function ListView({ className, setSelectedPage, selectedPage }) {
   }
 
   return (
-    <section className={`border-r-2 border-r-ibsilver-400 border-solid h-[100vh] overflow-scroll ${className}`}>
+    <section
+      className={`border-r-2 border-r-ibsilver-400 border-solid h-[100vh] overflow-scroll ${className}`}
+    >
       <h2 className="bold text-xl">ListView</h2>
       <ul>
-        <ProductList setSelectedPage={setSelectedPage} selectedPage={selectedPage} />
-        <CaseList setSelectedPage={setSelectedPage} selectedPage={selectedPage} />
+        <ProductList
+          setSelectedPage={setSelectedPage}
+          selectedPage={selectedPage}
+        />
+        <CaseList
+          setSelectedPage={setSelectedPage}
+          selectedPage={selectedPage}
+        />
       </ul>
     </section>
   );

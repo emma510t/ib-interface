@@ -16,7 +16,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 
 async function fetchData() {
-  const { data, error } = await supabase.from("ib-product-cards_duplicate").select("*");
+  const { data, error } = await supabase
+    .from("ib-product-cards_v2")
+    .select("*");
   if (error) {
     throw new Error(error.message);
   }
@@ -53,7 +55,10 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
   }
 
   const onHandleDeleteConfirm = async (id) => {
-    const { error } = await supabase.from("ib-product-cards_duplicate").delete().eq("id", id);
+    const { error } = await supabase
+      .from("ib-product-cards_v2")
+      .delete()
+      .eq("id", id);
   };
 
   return (
@@ -62,7 +67,9 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
         <li key={card.id} className="p-2 border-b-2 flex gap-2">
           <div>
             <p className="text-sm text-ibsilver-400">{card.parent}</p>
-            <h3 className="text-base font-medium break-words max-w-[180px]">{he.decode(card.title)}</h3>
+            <h3 className="text-base font-medium break-words max-w-[180px]">
+              {he.decode(card.title)}
+            </h3>
           </div>
           <div className="ml-auto flex gap-4 items-center">
             <AlertDialog>
@@ -72,11 +79,16 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                  <AlertDialogDescription>Ved at klikke Bekræft sletter du siden permanent. Dine ændringer kan ikke fortrydes.</AlertDialogDescription>
+                  <AlertDialogDescription>
+                    Ved at klikke Bekræft sletter du siden permanent. Dine
+                    ændringer kan ikke fortrydes.
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction onClick={onHandleDeleteConfirm(card.id)}>Bekræft</AlertDialogAction>
+                  <AlertDialogAction onClick={onHandleDeleteConfirm(card.id)}>
+                    Bekræft
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
