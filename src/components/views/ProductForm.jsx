@@ -22,7 +22,9 @@ export default function ProductForm({ className, selectedPage }) {
 
   const [submitting, setSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isParent, setIsParent] = useState(true);
+  const [parents, setParents] = useState([]);
+  const [consultingType, setConsultingType] = useState("");
+  const [parentSB, setParentSB] = useState("");
 
   useEffect(() => {
     if (formSubmitted) {
@@ -32,8 +34,23 @@ export default function ProductForm({ className, selectedPage }) {
 
   useEffect(() => {
     const fetchData = async () => {
+      const { data, error } = await supabase.from("ib-product-cards_v2").select("*").eq("parent", "consulting");
+      if (error) {
+        console.error("Error fetching data:", error.message);
+      } else {
+        const icons = data.map((item) => item.icon);
+        setParents(icons);
+      }
+    };
+    fetchData();
+  }, [selectedPage, setParents]);
+
+  useEffect(() => {
+    const fetchData = async () => {
       if (selectedPage.id !== "new") {
         const { data, error } = await supabase.from("ib-product-cards_v2").select("*").eq("id", selectedPage.id).single();
+        setConsultingType(data.parent === "consulting" ? data.parent : "product");
+        console.log(data.parent);
         if (error) {
           console.error("Error fetching data:", error.message);
         } else {
@@ -55,7 +72,7 @@ export default function ProductForm({ className, selectedPage }) {
       }
     };
     fetchData();
-  }, [selectedPage, reset]);
+  }, [selectedPage, reset, setConsultingType]);
 
   const onSubmit = async (data) => {
     try {
@@ -69,13 +86,13 @@ export default function ProductForm({ className, selectedPage }) {
           url: data.url,
           desc: data.cardDesc,
           icon: data.icon,
-          parent: data.parent,
-          content: data.content,
-          ydelse_content_1: data.pDesc1,
+          parent: parentSB,
+          content: [data.content.split("\n").map((line) => ({ text: line }))],
+          ydelse_content_1: [data.pDesc1.split("\n").map((line) => ({ text: line }))],
           ydelse_headline_2: data.pHeadline2,
-          ydelse_content_2: data.pDesc2,
+          ydelse_content_2: [data.pDesc2.split("\n").map((line) => ({ text: line }))],
           ydelse_headline_3: data.pHeadline3,
-          ydelse_content_3: data.pDesc3,
+          ydelse_content_3: [data.pDesc3.split("\n").map((line) => ({ text: line }))],
         },
       ]);
 
@@ -92,18 +109,23 @@ export default function ProductForm({ className, selectedPage }) {
 
   return (
     <section className={`p-4 ${className}`}>
-      <h2>Product form</h2>
+      <h2>
+        {selectedPage.id !== "new" && "Opdater konsulent side"}
+        {selectedPage.id === "new" && "Ny konsulent side"}
+      </h2>
       <Form>
         <form onSubmit={handleSubmit(onSubmit)} action="" className="flex flex-col gap-5">
           <div className="w-full flex gap-2">
             <Select
-              disabled={selectedPage.id !== "new"}
-              defaultValue={"consulting"}
-              onValueChange={() => {
-                if (SelectValue.Value === "consulting") {
-                  setIsParent(true);
-                } else if (SelectValue.Value === "product") {
-                  setIsParent(false);
+              id="category"
+              /* disabled={selectedPage.id !== "new"} */
+              defaultValue={consultingType}
+              onValueChange={(value) => {
+                if (value === "consulting") {
+                  setConsultingType("consulting");
+                  setParentSB("consulting");
+                } else if (value === "product") {
+                  setConsultingType("product");
                 }
               }}
             >
@@ -118,16 +140,24 @@ export default function ProductForm({ className, selectedPage }) {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {!isParent && (
-              <Select>
-                <SelectTrigger className={`mt-1.5 ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}>
+            {consultingType === "product" && (
+              <Select
+                id="parent"
+                onValueChange={(value) => {
+                  setParentSB(value);
+                }}
+              >
+                <SelectTrigger className={`mt-1.5 capitalize ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}>
                   <SelectValue placeholder="Konsulent område" />
                 </SelectTrigger>
                 <SelectContent className="border-ibsilver-500">
                   <SelectGroup>
                     <SelectLabel>Vælg konsulent område</SelectLabel>
-                    <SelectItem value="consulting">Konsulent Område</SelectItem>
-                    <SelectItem value="product">Konsulent Ydelse</SelectItem>
+                    {parents.map((parent) => (
+                      <SelectItem key={parent} value={parent} className="capitalize">
+                        {parent}
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -153,7 +183,7 @@ export default function ProductForm({ className, selectedPage }) {
             />
             {errors.url?.type === "required" && <FormError>Indtast stig til siden</FormError>}
           </div>
-          {isParent && (
+          {consultingType === "consulting" && (
             <div className="w-full">
               <Label htmlFor="cardDesc">cardDesc tekst*</Label>
               <Textarea
@@ -186,7 +216,7 @@ export default function ProductForm({ className, selectedPage }) {
             />
             {errors.content?.type === "required" && <FormError>Beskriv content og udfordringer</FormError>}
           </div>
-          {!isParent && (
+          {consultingType === "product" && (
             <>
               <div className="w-full">
                 <Label htmlFor="pDesc1">Beskrivelse*</Label>
@@ -243,10 +273,19 @@ export default function ProductForm({ className, selectedPage }) {
 
           <div></div>
           <div className="flex justify-between">
-            <Button disabled={submitting} variant="destructive">
-              Slet
-            </Button>
-            <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Udgiv/opdater"}</Button>
+            {selectedPage.id !== "new" && (
+              <>
+                <Button disabled={submitting} variant="destructive">
+                  Slet
+                </Button>
+                <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Opdater"}</Button>
+              </>
+            )}
+            {selectedPage.id === "new" && (
+              <Button className="ml-auto" disabled={submitting}>
+                {submitting ? "Udgiver..." : "Udgiv"}
+              </Button>
+            )}
           </div>
         </form>
       </Form>

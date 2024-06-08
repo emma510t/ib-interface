@@ -105,7 +105,10 @@ export default function CaseForm({ className, selectedPage }) {
 
   return (
     <section className={`p-4 ${className}`}>
-      <h2>CaseForm</h2>
+      <h2>
+        {selectedPage.id !== "new" && "Opdater case"}
+        {selectedPage.id === "new" && "Ny case"}
+      </h2>
       <Form>
         <form onSubmit={handleSubmit(onSubmit)} action="" className="flex flex-col gap-5">
           <div className="w-full">
@@ -210,10 +213,19 @@ export default function CaseForm({ className, selectedPage }) {
           </div>
           <div></div>
           <div className="flex justify-between">
-            <Button disabled={submitting} variant="destructive">
-              Slet
-            </Button>
-            <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Udgiv/opdater"}</Button>
+            {selectedPage.id !== "new" && (
+              <>
+                <Button disabled={submitting} variant="destructive">
+                  Slet
+                </Button>
+                <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Opdater"}</Button>
+              </>
+            )}
+            {selectedPage.id === "new" && (
+              <Button className="ml-auto" disabled={submitting}>
+                {submitting ? "Udgiver..." : "Udgiv"}
+              </Button>
+            )}
           </div>
         </form>
       </Form>
