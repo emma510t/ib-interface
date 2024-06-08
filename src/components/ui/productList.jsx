@@ -54,12 +54,12 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
     return <div>No data found</div>;
   }
 
-  const onHandleDeleteConfirm = async (id) => {
-    const { error } = await supabase
-      .from("ib-product-cards_v2")
-      .delete()
-      .eq("id", id);
-  };
+  // const onHandleDeleteConfirm = async (id) => {
+  //   const { error } = await supabase
+  //     .from("ib-product-cards_v2")
+  //     .delete()
+  //     .eq("id", id);
+  // };
 
   return (
     <>
@@ -71,7 +71,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
               {he.decode(card.title)}
             </h3>
           </div>
-          <div className="ml-auto flex gap-4 items-center">
+          <div className="ml-auto flex gap-4 items-center mr-2">
             <AlertDialog>
               <AlertDialogTrigger className="h-5 w-5">
                 <Trash2 className="stroke-ibred-400 h-5 w-5" />
@@ -86,9 +86,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction onClick={onHandleDeleteConfirm(card.id)}>
-                    Bekræft
-                  </AlertDialogAction>
+                  <AlertDialogAction>Bekræft</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

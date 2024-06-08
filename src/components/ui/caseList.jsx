@@ -52,9 +52,9 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
     return <div>No data found</div>;
   }
 
-  const onHandleDeleteConfirm = async (id) => {
-    const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
-  };
+  // const onHandleDeleteConfirm = async (id) => {
+  //   const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
+  // };
 
   return (
     <>
@@ -62,9 +62,11 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
         <li key={card.id} className="p-2 border-b-2 flex gap-2">
           <div>
             <p className="text-sm text-ibsilver-400">Cases</p>
-            <h3 className="text-base font-medium break-words max-w-[180px]">{he.decode(card.h1)}</h3>
+            <h3 className="text-base font-medium break-words max-w-[180px]">
+              {he.decode(card.h1)}
+            </h3>
           </div>
-          <div className="ml-auto flex gap-4 items-center">
+          <div className="ml-auto flex gap-4 items-center mr-2">
             <AlertDialog>
               <AlertDialogTrigger className="h-5 w-5">
                 <Trash2 className="stroke-ibred-400 h-5 w-5" />
@@ -72,11 +74,14 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                  <AlertDialogDescription>Ved at klikke Bekræft sletter du siden permanent. Dine ændringer kan ikke fortrydes.</AlertDialogDescription>
+                  <AlertDialogDescription>
+                    Ved at klikke Bekræft sletter du siden permanent. Dine
+                    ændringer kan ikke fortrydes.
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction onClick={onHandleDeleteConfirm(card.id)}>Bekræft</AlertDialogAction>
+                  <AlertDialogAction>Bekræft</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
