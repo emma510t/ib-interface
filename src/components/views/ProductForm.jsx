@@ -61,12 +61,12 @@ export default function ProductForm({ className, selectedPage }) {
             desc: data.cardDesc,
             icon: data.icon,
             parent: data.parent,
-            content: data.content,
-            ydelse_content_1: data.pDesc1,
-            ydelse_headline_2: data.pHeadline2,
-            ydelse_content_2: data.pDesc2,
-            ydelse_headline_3: data.pHeadline3,
-            ydelse_content_3: data.pDesc3,
+            content: data.content.map((obj) => obj.text).join("\n"),
+            ydelse_content_1: data.pDesc1 ? data.pDesc1.map((obj) => obj.text).join("\n") : "",
+            ydelse_headline_2: data.pHeadline2 || "",
+            ydelse_content_2: data.pDesc2 ? data.pDesc2.map((obj) => obj.text).join("\n") : "",
+            ydelse_headline_3: data.pHeadline3 || "",
+            ydelse_content_3: data.pDesc3 ? data.pDesc3.map((obj) => obj.text).join("\n") : "",
           });
         }
       }
@@ -142,6 +142,7 @@ export default function ProductForm({ className, selectedPage }) {
             </Select>
             {consultingType === "product" && (
               <Select
+                defaultValue={parentSB}
                 id="parent"
                 onValueChange={(value) => {
                   setParentSB(value);
@@ -207,14 +208,14 @@ export default function ProductForm({ className, selectedPage }) {
             {errors.icon?.type === "required" && <FormError>Indtast stig til siden</FormError>}
           </div>
           <div className="w-full">
-            <Label htmlFor="content">content og udfordinger*</Label>
+            <Label htmlFor="content">Beskrivende tekst{consultingType === "product" && " til område siden"}*</Label>
             <Textarea
               id="content"
               {...register("content", { required: true })}
               aria-invalid={errors.content ? "true" : "false"}
               className={`mt-1.5 ${errors.content ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
-            {errors.content?.type === "required" && <FormError>Beskriv content og udfordringer</FormError>}
+            {errors.content?.type === "required" && <FormError>Indsæt beskrivende tekst{consultingType === "product" && " til område siden"}</FormError>}
           </div>
           {consultingType === "product" && (
             <>
@@ -226,7 +227,7 @@ export default function ProductForm({ className, selectedPage }) {
                   aria-invalid={errors.pDesc1 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pDesc1 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pDesc1?.type === "required" && <FormError>Beskriv </FormError>}
+                {errors.pDesc1?.type === "required" && <FormError>Beskriv ydelsen</FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pHeadline2">Underrubrik*</Label>
@@ -236,7 +237,7 @@ export default function ProductForm({ className, selectedPage }) {
                   aria-invalid={errors.pHeadline2 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pHeadline2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pHeadline2?.type === "required" && <FormError>Indtast titel til </FormError>}
+                {errors.pHeadline2?.type === "required" && <FormError>Indtast titel underrubrik</FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pDesc2">Beskrivelse*</Label>
@@ -246,27 +247,16 @@ export default function ProductForm({ className, selectedPage }) {
                   aria-invalid={errors.pDesc2 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pDesc2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pDesc2?.type === "required" && <FormError>Beskriv </FormError>}
+                {errors.pDesc2?.type === "required" && <FormError>Indsæt beskrivelse</FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pHeadline3">Underrubrik</Label>
-                <Input
-                  id="pHeadline3"
-                  {...register("pHeadline3", { required: true })}
-                  aria-invalid={errors.pHeadline3 ? "true" : "false"}
-                  className={`mt-1.5 ${errors.pHeadline3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
-                />
+                <Input id="pHeadline3" {...register("pHeadline3", { required: false })} className={`mt-1.5 border-ibsilver-500`} />
                 {errors.pHeadline3?.type === "required" && <FormError>Indtast titel til </FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pDesc3">Beskrivelse</Label>
-                <Textarea
-                  id="pDesc3"
-                  {...register("pDesc3", { required: true })}
-                  aria-invalid={errors.pDesc3 ? "true" : "false"}
-                  className={`mt-1.5 ${errors.pDesc3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
-                />
-                {errors.pDesc3?.type === "required" && <FormError>Beskriv </FormError>}
+                <Textarea id="pDesc3" {...register("pDesc3", { required: false })} className={`mt-1.5 border-ibsilver-500`} />
               </div>
             </>
           )}
