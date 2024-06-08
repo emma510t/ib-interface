@@ -29,7 +29,7 @@ export default async function ListView({ className }) {
 
   return (
     <section
-      className={`border-r-2 border-r-ibsilver-400 border-solid ${className}`}
+      className={`border-r-2 border-r-ibsilver-400 border-solid h-[100vh] overflow-scroll ${className}`}
     >
       <h2 className="bold text-xl">ListView</h2>
       <ul>
