@@ -112,16 +112,18 @@ export default function ProductForm({ className, selectedPage }) {
     try {
       setSubmitting(true);
 
-      const content = data.content.split("\n").map((line) => ({ text: line }));
+      const content = data.content
+        ? data.content.split("\n").map((line) => ({ text: line }))
+        : null;
       const ydelse_content_1 = data.pDesc1
-        .split("\n")
-        .map((line) => ({ text: line }));
+        ? data.pDesc1.split("\n").map((line) => ({ text: line }))
+        : null;
       const ydelse_content_2 = data.pDesc2
-        .split("\n")
-        .map((line) => ({ text: line }));
+        ? data.pDesc2.split("\n").map((line) => ({ text: line }))
+        : null;
       const ydelse_content_3 = data.pDesc3
-        .split("\n")
-        .map((line) => ({ text: line }));
+        ? data.pDesc3.split("\n").map((line) => ({ text: line }))
+        : null;
 
       const insertData = {
         title: data.title,
@@ -138,12 +140,25 @@ export default function ProductForm({ className, selectedPage }) {
         ydelse_content_3,
       };
 
-      const { error } = await supabase
-        .from("ib-product-cards_v2")
-        .insert([insertData]);
+      if (selectedPage.id !== "new") {
+        // If selectedPage.id is not "new", update existing entry
+        const { error: updateError } = await supabase
+          .from("ib-product-cards_v2")
+          .update(insertData)
+          .match({ id: selectedPage.id });
 
-      if (error) {
-        throw error;
+        if (updateError) {
+          throw updateError;
+        }
+      } else {
+        // If selectedPage.id is "new", insert new entry
+        const { error: insertError } = await supabase
+          .from("ib-product-cards_v2")
+          .insert([insertData]);
+
+        if (insertError) {
+          throw insertError;
+        }
       }
     } catch (error) {
       console.error("Error submitting form data:", error.message);
@@ -157,6 +172,10 @@ export default function ProductForm({ className, selectedPage }) {
   //   const id = selectedPage.id;
   //   const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
   // };
+
+  const handleDelete = async () => {
+    console.log("slet denne", selectedPage.id);
+  };
 
   return (
     <section className={`p-4 ${className}`}>
@@ -403,7 +422,9 @@ export default function ProductForm({ className, selectedPage }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                      <AlertDialogAction>Bekræft</AlertDialogAction>
+                      <AlertDialogAction onClick={handleDelete}>
+                        Bekræft
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
