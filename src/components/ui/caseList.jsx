@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
 import he from "he";
 import {
@@ -14,15 +15,43 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 
-export default async function CaseList() {
+async function fetchCases() {
   const { data, error } = await supabase.from("ib-cases_v2").select("*");
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
 
-  if (error || !data || data.length === 0) {
-    // Handle the error case (e.g., return a 404 page or a different component)
-    return <div>Error: Data not found</div>;
+export default function CaseList({ setSelectedPage, selectedPage }) {
+  const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchCases()
+      .then((data) => {
+        setCases(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  const cases = data;
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (cases.length === 0) {
+    return <div>No data found</div>;
+  }
+
   return (
     <>
       {cases.map((card) => (
@@ -52,7 +81,14 @@ export default async function CaseList() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button size="icon" className="bg-transparent hover:bg-transparent">
+            <Button
+              size="icon"
+              className="bg-transparent hover:bg-transparent"
+              onClick={() => {
+                setSelectedPage({ id: card.id, type: "cases" });
+                console.log(selectedPage);
+              }}
+            >
               <Pencil className="stroke-ibsilver-600" />
             </Button>
           </div>
