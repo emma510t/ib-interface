@@ -55,6 +55,15 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
   // const onHandleDeleteConfirm = async (id) => {
   //   const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
   // };
+  const handleDelete = async () => {
+    console.log("slet denne", selectedPage.id);
+    await supabase
+      .from("ib-product-cards_v2")
+      .delete()
+      .eq("id", selectedPage.id)
+      .single();
+    setSelectedPage({ id: "", type: "" });
+  };
 
   return (
     <>
@@ -81,7 +90,9 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction>Bekræft</AlertDialogAction>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Bekræft
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

@@ -30,7 +30,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function ProductForm({ className, selectedPage }) {
+export default function ProductForm({
+  className,
+  selectedPage,
+  setSelectedPage,
+}) {
   const {
     register,
     handleSubmit,
@@ -175,6 +179,12 @@ export default function ProductForm({ className, selectedPage }) {
 
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
+    await supabase
+      .from("ib-product-cards_v2")
+      .delete()
+      .eq("id", selectedPage.id)
+      .single();
+    setSelectedPage({ id: "", type: "" });
   };
 
   return (

@@ -31,6 +31,7 @@ export default function Home() {
             <ProductForm
               className="col-span-2 max-w-full w-screen md:h-screen md:sticky md:overflow-auto"
               selectedPage={selectedPage}
+              setSelectedPage={setSelectedPage}
             />
           ) : (
             <section className="col-span-2 max-w-full w-screen md:h-screen md:sticky">
