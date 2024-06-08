@@ -21,7 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function CaseForm({ className, selectedPage }) {
+export default function CaseForm({ className, selectedPage, setSelectedPage }) {
   const {
     register,
     control,
@@ -71,44 +71,39 @@ export default function CaseForm({ className, selectedPage }) {
   const onSubmit = async (data) => {
     try {
       setSubmitting(true);
-      let response;
-      if (selectedPage.id) {
-        // Update existing case
-        response = await supabase
-          .from("ib-cases_v2")
-          .update({
-            h1: data.virksomhed,
-            situation_udfordringer: data.situation,
-            slug: data.url,
-            intro: data.intro,
-            fase_1_headline: data.titel1,
-            fase_1_text: data.desc1,
-            fase_2_headline: data.titel2,
-            fase_2_text: data.desc2,
-            fase_3_headline: data.titel3,
-            fase_3_text: data.desc3,
-          })
-          .eq("id", selectedPage.id);
-      } else {
-        // Insert new case
-        response = await supabase.from("ib-cases_v2").insert([
-          {
-            h1: data.virksomhed,
-            situation_udfordringer: data.situation,
-            slug: data.url,
-            intro: data.intro,
-            fase_1_headline: data.titel1,
-            fase_1_text: data.desc1,
-            fase_2_headline: data.titel2,
-            fase_2_text: data.desc2,
-            fase_3_headline: data.titel3,
-            fase_3_text: data.desc3,
-          },
-        ]);
-      }
 
-      if (response.error) {
-        throw response.error;
+      const insertData = {
+        h1: data.virksomhed,
+        situation_udfordringer: data.situation,
+        slug: data.url,
+        intro: data.intro,
+        fase_1_headline: data.titel1,
+        fase_1_text: data.desc1,
+        fase_2_headline: data.titel2,
+        fase_2_text: data.desc2,
+        fase_3_headline: data.titel3,
+        fase_3_text: data.desc3,
+      };
+
+      if (selectedPage.id !== "new") {
+        // If selectedPage.id is not "new", update existing entry
+        const { error: updateError } = await supabase
+          .from("ib-cases_v2")
+          .update(insertData)
+          .match({ id: selectedPage.id });
+
+        if (updateError) {
+          throw updateError;
+        }
+      } else {
+        // If selectedPage.id is "new", insert new entry
+        const { error: insertError } = await supabase
+          .from("ib-cases_v2")
+          .insert([insertData]);
+
+        if (insertError) {
+          throw insertError;
+        }
       }
     } catch (error) {
       console.error("Error submitting form data:", error.message);
@@ -121,7 +116,7 @@ export default function CaseForm({ className, selectedPage }) {
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
     await supabase
-      .from("ib-product-cards_v2")
+      .from("ib-cases_v2")
       .delete()
       .eq("id", selectedPage.id)
       .single();

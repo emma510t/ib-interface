@@ -26,6 +26,7 @@ export default function Home() {
             <CaseForm
               className="col-span-2 max-w-full w-screen md:h-screen md:sticky md:overflow-auto"
               selectedPage={selectedPage}
+              setSelectedPage={setSelectedPage}
             />
           ) : selectedPage.type === "product" ? (
             <ProductForm
