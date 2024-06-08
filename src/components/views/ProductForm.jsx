@@ -11,23 +11,51 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 
-export default function ProductForm({ className }) {
+export default function ProductForm({ className, selectedPage }) {
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
 
   const [submitting, setSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isParent, setIsParent] = useState(false);
+  const [isParent, setIsParent] = useState(true);
 
   useEffect(() => {
     if (formSubmitted) {
       window.scrollTo(0, 0);
     }
   }, [formSubmitted]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedPage.id !== "new") {
+        const { data, error } = await supabase.from("ib-product-cards_v2").select("*").eq("id", selectedPage.id).single();
+        if (error) {
+          console.error("Error fetching data:", error.message);
+        } else {
+          reset({
+            title: data.title,
+            //card_title: data.title,
+            url: data.url,
+            desc: data.cardDesc,
+            icon: data.icon,
+            parent: data.parent,
+            content: data.content,
+            ydelse_content_1: data.pDesc1,
+            ydelse_headline_2: data.pHeadline2,
+            ydelse_content_2: data.pDesc2,
+            ydelse_headline_3: data.pHeadline3,
+            ydelse_content_3: data.pDesc3,
+          });
+        }
+      }
+    };
+    fetchData();
+  }, [selectedPage, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -43,11 +71,11 @@ export default function ProductForm({ className }) {
           icon: data.icon,
           parent: data.parent,
           content: data.content,
-          ydelse_content_1: data.ppDesc1,
+          ydelse_content_1: data.pDesc1,
           ydelse_headline_2: data.pHeadline2,
-          ydelse_content_2: data.ppDesc2,
+          ydelse_content_2: data.pDesc2,
           ydelse_headline_3: data.pHeadline3,
-          ydelse_content_3: data.ppDesc3,
+          ydelse_content_3: data.pDesc3,
         },
       ]);
 
@@ -64,11 +92,21 @@ export default function ProductForm({ className }) {
 
   return (
     <section className={`p-4 ${className}`}>
-      <h2>CaseForm</h2>
+      <h2>Product form</h2>
       <Form>
         <form onSubmit={handleSubmit(onSubmit)} action="" className="flex flex-col gap-5">
           <div className="w-full flex gap-2">
-            <Select>
+            <Select
+              disabled={selectedPage.id !== "new"}
+              defaultValue={"consulting"}
+              onValueChange={() => {
+                if (SelectValue.Value === "consulting") {
+                  setIsParent(true);
+                } else if (SelectValue.Value === "product") {
+                  setIsParent(false);
+                }
+              }}
+            >
               <SelectTrigger className={`mt-1.5 ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}>
                 <SelectValue placeholder="Konsulent type" />
               </SelectTrigger>
@@ -158,7 +196,7 @@ export default function ProductForm({ className }) {
                   aria-invalid={errors.pDesc1 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pDesc1 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pDesc1?.type === "required" && <BormError>Beskriv </BormError>}
+                {errors.pDesc1?.type === "required" && <FormError>Beskriv </FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pHeadline2">Underrubrik*</Label>
@@ -168,7 +206,7 @@ export default function ProductForm({ className }) {
                   aria-invalid={errors.pHeadline2 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pHeadline2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pHeadline2?.type === "required" && <BormError>Indtast titel til </BormError>}
+                {errors.pHeadline2?.type === "required" && <FormError>Indtast titel til </FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pDesc2">Beskrivelse*</Label>
@@ -178,7 +216,7 @@ export default function ProductForm({ className }) {
                   aria-invalid={errors.pDesc2 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pDesc2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pDesc2?.type === "required" && <BormError>Beskriv </BormError>}
+                {errors.pDesc2?.type === "required" && <FormError>Beskriv </FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pHeadline3">Underrubrik</Label>
@@ -188,7 +226,7 @@ export default function ProductForm({ className }) {
                   aria-invalid={errors.pHeadline3 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pHeadline3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pHeadline3?.type === "required" && <BormError>Indtast titel til </BormError>}
+                {errors.pHeadline3?.type === "required" && <FormError>Indtast titel til </FormError>}
               </div>
               <div className="w-full">
                 <Label htmlFor="pDesc3">Beskrivelse</Label>
@@ -198,7 +236,7 @@ export default function ProductForm({ className }) {
                   aria-invalid={errors.pDesc3 ? "true" : "false"}
                   className={`mt-1.5 ${errors.pDesc3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
                 />
-                {errors.pDesc3?.type === "required" && <BormError>Beskriv </BormError>}
+                {errors.pDesc3?.type === "required" && <FormError>Beskriv </FormError>}
               </div>
             </>
           )}
