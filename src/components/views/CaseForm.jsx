@@ -118,6 +118,16 @@ export default function CaseForm({ className, selectedPage }) {
     }
   };
 
+  const handleDelete = async () => {
+    console.log("slet denne", selectedPage.id);
+    await supabase
+      .from("ib-product-cards_v2")
+      .delete()
+      .eq("id", selectedPage.id)
+      .single();
+    setSelectedPage({ id: "", type: "" });
+  };
+
   return (
     <section className={`p-4 ${className}`}>
       <h2>
@@ -308,7 +318,9 @@ export default function CaseForm({ className, selectedPage }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                      <AlertDialogAction>Bekræft</AlertDialogAction>
+                      <AlertDialogAction onClick={handleDelete}>
+                        Bekræft
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

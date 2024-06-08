@@ -58,7 +58,7 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
     await supabase
-      .from("ib-product-cards_v2")
+      .from("ib-cases_v2")
       .delete()
       .eq("id", selectedPage.id)
       .single();
@@ -77,7 +77,12 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
           </div>
           <div className="ml-auto flex gap-4 items-center mr-2">
             <AlertDialog>
-              <AlertDialogTrigger className="h-5 w-5">
+              <AlertDialogTrigger
+                className="h-5 w-5"
+                onClick={() => {
+                  setSelectedPage({ id: card.id, type: "cases" });
+                }}
+              >
                 <Trash2 className="stroke-ibred-400 h-5 w-5" />
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -101,7 +106,6 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
               className="bg-transparent hover:bg-transparent"
               onClick={() => {
                 setSelectedPage({ id: card.id, type: "cases" });
-                console.log(selectedPage);
               }}
             >
               <Pencil className="stroke-ibsilver-600" />
