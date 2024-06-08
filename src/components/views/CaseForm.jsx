@@ -9,6 +9,17 @@ import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function CaseForm({ className, selectedPage }) {
   const {
@@ -211,13 +222,27 @@ export default function CaseForm({ className, selectedPage }) {
             />
             {errors.desc3?.type === "required" && <FormError>Beskriv fase 3</FormError>}
           </div>
-          <div></div>
+
           <div className="flex justify-between">
             {selectedPage.id !== "new" && (
               <>
-                <Button disabled={submitting} variant="destructive">
-                  Slet
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger className="h-5 w-5">
+                    <Button disabled={submitting} variant="destructive">
+                      Slet
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                      <AlertDialogDescription>Ved at klikke Bekræft sletter du siden permanent. Dine ændringer kan ikke fortrydes.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Fortryd</AlertDialogCancel>
+                      <AlertDialogAction onClick={onHandleDeleteConfirm}>Bekræft</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Opdater"}</Button>
               </>
             )}

@@ -9,15 +9,18 @@ import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ProductForm({ className, selectedPage }) {
   const {
@@ -41,10 +44,7 @@ export default function ProductForm({ className, selectedPage }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("ib-product-cards_v2")
-        .select("*")
-        .eq("parent", "consulting");
+      const { data, error } = await supabase.from("ib-product-cards_v2").select("*").eq("parent", "consulting");
       if (error) {
         console.error("Error fetching data:", error.message);
       } else {
@@ -58,18 +58,12 @@ export default function ProductForm({ className, selectedPage }) {
   useEffect(() => {
     const fetchData = async () => {
       if (selectedPage.id !== "new") {
-        const { data, error } = await supabase
-          .from("ib-product-cards_v2")
-          .select("*")
-          .eq("id", selectedPage.id)
-          .single();
+        const { data, error } = await supabase.from("ib-product-cards_v2").select("*").eq("id", selectedPage.id).single();
         if (error) {
           console.error("Error fetching data:", error.message);
         } else {
           console.log("Fetched Data:", data);
-          setConsultingType(
-            data.parent === "consulting" ? "consulting" : "product"
-          );
+          setConsultingType(data.parent === "consulting" ? "consulting" : "product");
           setParentSB(data.parent);
 
           reset({
@@ -79,17 +73,11 @@ export default function ProductForm({ className, selectedPage }) {
             icon: data.icon,
             parent: data.parent,
             content: data.content.map((obj) => obj.text).join("\n"),
-            pDesc1: data.ydelse_content_1
-              ? data.ydelse_content_1.map((obj) => obj.text).join("\n")
-              : "",
+            pDesc1: data.ydelse_content_1 ? data.ydelse_content_1.map((obj) => obj.text).join("\n") : "",
             pHeadline2: data.ydelse_headline_2 || "",
-            pDesc2: data.ydelse_content_2
-              ? data.ydelse_content_2.map((obj) => obj.text).join("\n")
-              : "",
+            pDesc2: data.ydelse_content_2 ? data.ydelse_content_2.map((obj) => obj.text).join("\n") : "",
             pHeadline3: data.ydelse_headline_3 || "",
-            pDesc3: data.ydelse_content_3
-              ? data.ydelse_content_3.map((obj) => obj.text).join("\n")
-              : "",
+            pDesc3: data.ydelse_content_3 ? data.ydelse_content_3.map((obj) => obj.text).join("\n") : "",
           });
         }
       }
@@ -102,15 +90,9 @@ export default function ProductForm({ className, selectedPage }) {
       setSubmitting(true);
 
       const content = data.content.split("\n").map((line) => ({ text: line }));
-      const ydelse_content_1 = data.pDesc1
-        .split("\n")
-        .map((line) => ({ text: line }));
-      const ydelse_content_2 = data.pDesc2
-        .split("\n")
-        .map((line) => ({ text: line }));
-      const ydelse_content_3 = data.pDesc3
-        .split("\n")
-        .map((line) => ({ text: line }));
+      const ydelse_content_1 = data.pDesc1.split("\n").map((line) => ({ text: line }));
+      const ydelse_content_2 = data.pDesc2.split("\n").map((line) => ({ text: line }));
+      const ydelse_content_3 = data.pDesc3.split("\n").map((line) => ({ text: line }));
 
       const insertData = {
         title: data.title,
@@ -127,9 +109,7 @@ export default function ProductForm({ className, selectedPage }) {
         ydelse_content_3,
       };
 
-      const { error } = await supabase
-        .from("ib-product-cards_v2")
-        .insert([insertData]);
+      const { error } = await supabase.from("ib-product-cards_v2").insert([insertData]);
 
       if (error) {
         throw error;
@@ -142,13 +122,14 @@ export default function ProductForm({ className, selectedPage }) {
     }
   };
 
+  const onHandleDeleteConfirm = async () => {
+    const id = selectedPage.id;
+    const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
+  };
+
   return (
     <section className={`p-4 ${className}`}>
-      <h2>
-        {selectedPage.id !== "new"
-          ? "Opdater konsulent side"
-          : "Ny konsulent side"}
-      </h2>
+      <h2>{selectedPage.id !== "new" ? "Opdater konsulent side" : "Ny konsulent side"}</h2>
       <Form>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           {selectedPage.id === "new" && (
@@ -161,13 +142,7 @@ export default function ProductForm({ className, selectedPage }) {
                   setParentSB(value === "consulting" ? "consulting" : "");
                 }}
               >
-                <SelectTrigger
-                  className={`mt-1.5 ${
-                    errors.title
-                      ? "border-ibred-400 border-2"
-                      : "border-ibsilver-500"
-                  }`}
-                >
+                <SelectTrigger className={`mt-1.5 ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}>
                   <SelectValue placeholder="Konsulent type" />
                 </SelectTrigger>
                 <SelectContent className="border-ibsilver-500">
@@ -179,29 +154,15 @@ export default function ProductForm({ className, selectedPage }) {
                 </SelectContent>
               </Select>
               {consultingType === "product" && (
-                <Select
-                  defaultValue={parentSB}
-                  id="parent"
-                  onValueChange={(value) => setParentSB(value)}
-                >
-                  <SelectTrigger
-                    className={`mt-1.5 capitalize ${
-                      errors.title
-                        ? "border-ibred-400 border-2"
-                        : "border-ibsilver-500"
-                    }`}
-                  >
+                <Select defaultValue={parentSB} id="parent" onValueChange={(value) => setParentSB(value)}>
+                  <SelectTrigger className={`mt-1.5 capitalize ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}>
                     <SelectValue placeholder="Konsulent område" />
                   </SelectTrigger>
                   <SelectContent className="border-ibsilver-500">
                     <SelectGroup>
                       <SelectLabel>Vælg konsulent område</SelectLabel>
                       {parents.map((parent) => (
-                        <SelectItem
-                          key={parent}
-                          value={parent}
-                          className="capitalize"
-                        >
+                        <SelectItem key={parent} value={parent} className="capitalize">
                           {parent}
                         </SelectItem>
                       ))}
@@ -218,15 +179,9 @@ export default function ProductForm({ className, selectedPage }) {
               id="title"
               {...register("title", { required: true })}
               aria-invalid={errors.title ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.title
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
+              className={`mt-1.5 ${errors.title ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
-            {errors.title?.type === "required" && (
-              <FormError>Indtast Titel</FormError>
-            )}
+            {errors.title?.type === "required" && <FormError>Indtast Titel</FormError>}
           </div>
           <div className="w-full">
             <Label htmlFor="url">Url*</Label>
@@ -234,30 +189,20 @@ export default function ProductForm({ className, selectedPage }) {
               id="url"
               {...register("url", { required: true })}
               aria-invalid={errors.url ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.url ? "border-ibred-400 border-2" : "border-ibsilver-500"
-              }`}
+              className={`mt-1.5 ${errors.url ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
-            {errors.url?.type === "required" && (
-              <FormError>Indtast stig til siden</FormError>
-            )}
+            {errors.url?.type === "required" && <FormError>Indtast stig til siden</FormError>}
           </div>
           {consultingType === "consulting" && (
             <div className="w-full">
-              <Label htmlFor="desc">cardDesc tekst*</Label>
+              <Label htmlFor="desc">Beskrivelse til produktkort*</Label>
               <Textarea
                 id="desc"
                 {...register("desc", { required: true })}
                 aria-invalid={errors.desc ? "true" : "false"}
-                className={`mt-1.5 ${
-                  errors.desc
-                    ? "border-ibred-400 border-2"
-                    : "border-ibsilver-500"
-                }`}
+                className={`mt-1.5 ${errors.desc ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
               />
-              {errors.desc?.type === "required" && (
-                <FormError>Indtast cardDesc tekst</FormError>
-              )}
+              {errors.desc?.type === "required" && <FormError>Indtast beskrivelse til produktkort</FormError>}
             </div>
           )}
           <div className="w-full">
@@ -266,105 +211,97 @@ export default function ProductForm({ className, selectedPage }) {
               id="icon"
               {...register("icon", { required: true })}
               aria-invalid={errors.icon ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.icon
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
+              className={`mt-1.5 ${errors.icon ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
-            {errors.icon?.type === "required" && (
-              <FormError>Indtast ikon navn</FormError>
-            )}
+            {errors.icon?.type === "required" && <FormError>Indtast ikon navn</FormError>}
           </div>
           <div className="w-full">
-            <Label htmlFor="content">Indhold*</Label>
+            <Label htmlFor="content">Beskrivende tekst{consultingType === "product" && " til område siden"}*</Label>
             <Textarea
               id="content"
               {...register("content", { required: true })}
               aria-invalid={errors.content ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.content
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
+              className={`mt-1.5 ${errors.content ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
             />
-            {errors.content?.type === "required" && (
-              <FormError>Indtast indhold</FormError>
+            {errors.content?.type === "required" && <FormError>Indtast indhold</FormError>}
+          </div>
+          {consultingType === "product" && (
+            <>
+              <div className="w-full">
+                <Label htmlFor="pDesc1">#1 tekst*</Label>
+                <Textarea
+                  id="pDesc1"
+                  {...register("pDesc1")}
+                  aria-invalid={errors.pDesc1 ? "true" : "false"}
+                  className={`mt-1.5 ${errors.pDesc1 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="pHeadline2">#2 underrubrik*</Label>
+                <Input
+                  id="pHeadline2"
+                  {...register("pHeadline2")}
+                  aria-invalid={errors.pHeadline2 ? "true" : "false"}
+                  className={`mt-1.5 ${errors.pHeadline2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="pDesc2">#2 tekst*</Label>
+                <Textarea
+                  id="pDesc2"
+                  {...register("pDesc2")}
+                  aria-invalid={errors.pDesc2 ? "true" : "false"}
+                  className={`mt-1.5 ${errors.pDesc2 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="pHeadline3">#3 underrubrik</Label>
+                <Input
+                  id="pHeadline3"
+                  {...register("pHeadline3")}
+                  aria-invalid={errors.pHeadline3 ? "true" : "false"}
+                  className={`mt-1.5 ${errors.pHeadline3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="pDesc3">#3 tekst</Label>
+                <Textarea
+                  id="pDesc3"
+                  {...register("pDesc3")}
+                  aria-invalid={errors.pDesc3 ? "true" : "false"}
+                  className={`mt-1.5 ${errors.pDesc3 ? "border-ibred-400 border-2" : "border-ibsilver-500"}`}
+                />
+              </div>
+            </>
+          )}
+          <div className="flex justify-between">
+            {selectedPage.id !== "new" && (
+              <>
+                <AlertDialog>
+                  <AlertDialogTrigger className="h-5 w-5">
+                    <Button disabled={submitting} variant="destructive">
+                      Slet
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                      <AlertDialogDescription>Ved at klikke Bekræft sletter du siden permanent. Dine ændringer kan ikke fortrydes.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Fortryd</AlertDialogCancel>
+                      <AlertDialogAction onClick={onHandleDeleteConfirm}>Bekræft</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button disabled={submitting}>{submitting ? "Opdaterer..." : "Opdater"}</Button>
+              </>
             )}
-          </div>
-          <div className="w-full">
-            <Label htmlFor="pDesc1">Afkradsering #1 tekst</Label>
-            <Textarea
-              id="pDesc1"
-              {...register("pDesc1")}
-              aria-invalid={errors.pDesc1 ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.pDesc1
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
-            />
-          </div>
-          <div className="w-full">
-            <Label htmlFor="pHeadline2">Afkradsering #2 Overskrift</Label>
-            <Input
-              id="pHeadline2"
-              {...register("pHeadline2")}
-              aria-invalid={errors.pHeadline2 ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.pHeadline2
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
-            />
-          </div>
-          <div className="w-full">
-            <Label htmlFor="pDesc2">Afkradsering #2 tekst</Label>
-            <Textarea
-              id="pDesc2"
-              {...register("pDesc2")}
-              aria-invalid={errors.pDesc2 ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.pDesc2
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
-            />
-          </div>
-          <div className="w-full">
-            <Label htmlFor="pHeadline3">Afkradsering #3 Overskrift</Label>
-            <Input
-              id="pHeadline3"
-              {...register("pHeadline3")}
-              aria-invalid={errors.pHeadline3 ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.pHeadline3
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
-            />
-          </div>
-          <div className="w-full">
-            <Label htmlFor="pDesc3">Afkradsering #3 tekst</Label>
-            <Textarea
-              id="pDesc3"
-              {...register("pDesc3")}
-              aria-invalid={errors.pDesc3 ? "true" : "false"}
-              className={`mt-1.5 ${
-                errors.pDesc3
-                  ? "border-ibred-400 border-2"
-                  : "border-ibsilver-500"
-              }`}
-            />
-          </div>
-          <div>
-            <Button
-              type="submit"
-              className="inline-block bg-ibgreen-500 text-white px-6 py-2.5 rounded-sm bg-ibsilver-500"
-              disabled={submitting}
-            >
-              {submitting ? "Indsendelse..." : "Indsend"}
-            </Button>
+            {selectedPage.id === "new" && (
+              <Button className="ml-auto" disabled={submitting}>
+                {submitting ? "Udgiver..." : "Udgiv"}
+              </Button>
+            )}
           </div>
         </form>
       </Form>

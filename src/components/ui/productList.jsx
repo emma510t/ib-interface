@@ -16,7 +16,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 
 async function fetchData() {
-  const { data, error } = await supabase.from("ib-product-cards_v2").select("*");
+  const { data, error } = await supabase.from("ib-product-cards_duplicate").select("*");
   if (error) {
     throw new Error(error.message);
   }
@@ -52,6 +52,10 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
     return <div>No data found</div>;
   }
 
+  const onHandleDeleteConfirm = async (id) => {
+    const { error } = await supabase.from("ib-product-cards_duplicate").delete().eq("id", id);
+  };
+
   return (
     <>
       {productCards.map((card) => (
@@ -72,7 +76,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Fortryd</AlertDialogCancel>
-                  <AlertDialogAction>Bekræft</AlertDialogAction>
+                  <AlertDialogAction onClick={onHandleDeleteConfirm(card.id)}>Bekræft</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
