@@ -9,6 +9,8 @@ import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
+import { useToast } from "@/components/ui/use-toast";
+
 import {
   Select,
   SelectContent,
@@ -47,12 +49,23 @@ export default function ProductForm({
   const [parents, setParents] = useState([]);
   const [consultingType, setConsultingType] = useState("");
   const [parentSB, setParentSB] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     if (formSubmitted) {
       window.scrollTo(0, 0);
     }
   }, [formSubmitted]);
+
+  useEffect(() => {
+    if (formSubmitted) {
+      toast({
+        title: "Siden er udgivet!",
+        description:
+          "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
+      });
+    }
+  }, [formSubmitted, toast]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,6 +128,10 @@ export default function ProductForm({
   const onSubmit = async (data) => {
     try {
       setSubmitting(true);
+      setSelectedPage({
+        id: "",
+        type: "",
+      });
 
       const content = data.content
         ? data.content.split("\n").map((line) => ({ text: line }))
@@ -172,11 +189,6 @@ export default function ProductForm({
     }
   };
 
-  // const onHandleDeleteConfirm = async () => {
-  //   const id = selectedPage.id;
-  //   const { error } = await supabase.from("ib-product-cards_v2").delete().eq("id", id);
-  // };
-
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
     await supabase
@@ -185,6 +197,10 @@ export default function ProductForm({
       .eq("id", selectedPage.id)
       .single();
     setSelectedPage({ id: "", type: "" });
+    toast({
+      title: "Siden er slettet!",
+      description: "Din side er nu permanent fjernet",
+    });
   };
 
   return (
@@ -438,13 +454,24 @@ export default function ProductForm({
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button disabled={submitting}>
+                <Button
+                  disabled={submitting}
+                  onClick={() => {
+                    setFormSubmitted(true);
+                  }}
+                >
                   {submitting ? "Opdaterer..." : "Opdater"}
                 </Button>
               </>
             )}
             {selectedPage.id === "new" && (
-              <Button className="ml-auto" disabled={submitting}>
+              <Button
+                className="ml-auto"
+                disabled={submitting}
+                onClick={() => {
+                  setFormSubmitted(true);
+                }}
+              >
                 {submitting ? "Udgiver..." : "Udgiv"}
               </Button>
             )}

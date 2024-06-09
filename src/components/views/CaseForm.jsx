@@ -9,6 +9,8 @@ import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
+import { useToast } from "@/components/ui/use-toast";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,12 +34,23 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
 
   const [submitting, setSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (formSubmitted) {
       window.scrollTo(0, 0);
     }
   }, [formSubmitted]);
+
+  useEffect(() => {
+    if (formSubmitted) {
+      toast({
+        title: "Siden er udgivet!",
+        description:
+          "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
+      });
+    }
+  }, [formSubmitted, toast]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,6 +134,10 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
       .eq("id", selectedPage.id)
       .single();
     setSelectedPage({ id: "", type: "" });
+    toast({
+      title: "Siden er slettet!",
+      description: "Din side er nu permanent fjernet",
+    });
   };
 
   return (
@@ -319,13 +336,24 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button disabled={submitting}>
+                <Button
+                  disabled={submitting}
+                  onClick={() => {
+                    setFormSubmitted(true);
+                  }}
+                >
                   {submitting ? "Opdaterer..." : "Opdater"}
                 </Button>
               </>
             )}
             {selectedPage.id === "new" && (
-              <Button className="ml-auto" disabled={submitting}>
+              <Button
+                className="ml-auto"
+                disabled={submitting}
+                onClick={() => {
+                  setFormSubmitted(true);
+                }}
+              >
                 {submitting ? "Udgiver..." : "Udgiv"}
               </Button>
             )}

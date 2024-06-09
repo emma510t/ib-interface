@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 async function fetchData() {
   const { data, error } = await supabase
@@ -29,6 +30,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
   const [productCards, setProductCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchData()
@@ -69,6 +71,10 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
       .eq("id", selectedPage.id)
       .single();
     setSelectedPage({ id: "", type: "" });
+    toast({
+      title: "Siden er slettet!",
+      description: "Din side er nu permanent fjernet",
+    });
   };
 
   return (

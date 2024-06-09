@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 async function fetchCases() {
   const { data, error } = await supabase.from("ib-cases_v2").select("*");
@@ -27,6 +28,7 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchCases()
@@ -63,6 +65,10 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
       .eq("id", selectedPage.id)
       .single();
     setSelectedPage({ id: "", type: "" });
+    toast({
+      title: "Siden er slettet!",
+      description: "Din side er nu permanent fjernet",
+    });
   };
 
   return (
