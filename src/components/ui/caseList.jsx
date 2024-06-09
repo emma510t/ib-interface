@@ -12,9 +12,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from "lucide-react";
+import { Globe, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 async function fetchCases() {
   const { data, error } = await supabase.from("ib-cases_v2").select("*");
@@ -81,6 +82,22 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
             </h3>
           </div>
           <div className="ml-auto flex gap-4 items-center mr-2">
+            <Link
+              href={`https://improve-business-rettelser.vercel.app/cases/${card.slug}`}
+              target="_blank"
+              passHref={true}
+            >
+              <Globe className="h-5 w-5" />
+            </Link>
+            <Button
+              size="icon"
+              className="bg-transparent hover:bg-transparent"
+              onClick={() => {
+                setSelectedPage({ id: card.id, type: "cases" });
+              }}
+            >
+              <Pencil className="stroke-ibsilver-600" />
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger
                 className="h-5 w-5"
@@ -106,15 +123,6 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button
-              size="icon"
-              className="bg-transparent hover:bg-transparent"
-              onClick={() => {
-                setSelectedPage({ id: card.id, type: "cases" });
-              }}
-            >
-              <Pencil className="stroke-ibsilver-600" />
-            </Button>
           </div>
         </li>
       ))}

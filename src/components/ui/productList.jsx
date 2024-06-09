@@ -12,9 +12,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from "lucide-react";
+import { Globe, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 async function fetchData() {
   const { data, error } = await supabase
@@ -75,7 +76,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
   return (
     <>
       {productCards.map((card) => (
-        <li key={card.id} className="p-2 border-b-2 flex gap-2">
+        <li key={card.id} className="p-2 flex gap-2 border-b-2">
           <div>
             <p className="text-sm text-ibsilver-400">{card.parent}</p>
             <h3 className="text-base font-medium break-words max-w-[180px]">
@@ -83,7 +84,24 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
             </h3>
           </div>
           <div className="ml-auto flex gap-4 items-center mr-2">
-            <AlertDialog>
+            <Link
+              href={`https://improve-business-rettelser.vercel.app/consulting/${card.url}`}
+              target="_blank"
+              passHref={true}
+            >
+              <Globe className="h-5 w-5" />
+            </Link>
+            <Button
+              size="icon"
+              className="bg-transparent hover:bg-transparent z-50"
+              onClick={() => {
+                setSelectedPage({ id: card.id, type: "product" });
+                console.log(selectedPage);
+              }}
+            >
+              <Pencil className="stroke-ibsilver-600" />
+            </Button>
+            <AlertDialog className="z-50">
               <AlertDialogTrigger
                 className="h-5 w-5"
                 onClick={() => {
@@ -108,16 +126,6 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button
-              size="icon"
-              className="bg-transparent hover:bg-transparent"
-              onClick={() => {
-                setSelectedPage({ id: card.id, type: "product" });
-                console.log(selectedPage);
-              }}
-            >
-              <Pencil className="stroke-ibsilver-600" />
-            </Button>
           </div>
         </li>
       ))}

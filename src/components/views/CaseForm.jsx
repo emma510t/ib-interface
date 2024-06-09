@@ -143,7 +143,7 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
 
   return (
     <section className={`p-4 ${className}`}>
-      <h2>
+      <h2 className="text-2xl font-bold mb-4">
         {selectedPage.id !== "new" && "Opdater case"}
         {selectedPage.id === "new" && "Ny case"}
       </h2>
