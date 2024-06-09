@@ -64,7 +64,7 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
     await supabase
-      .from("ib-cases_v2")
+      .from("ib-product-cards_v2")
       .delete()
       .eq("id", selectedPage.id)
       .single();
@@ -83,7 +83,12 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
           </div>
           <div className="ml-auto flex gap-4 items-center mr-2">
             <AlertDialog>
-              <AlertDialogTrigger className="h-5 w-5">
+              <AlertDialogTrigger
+                className="h-5 w-5"
+                onClick={() => {
+                  setSelectedPage({ id: card.id, type: "product" });
+                }}
+              >
                 <Trash2 className="stroke-ibred-400 h-5 w-5" />
               </AlertDialogTrigger>
               <AlertDialogContent>
