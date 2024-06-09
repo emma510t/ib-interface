@@ -58,16 +58,6 @@ export default function ProductForm({
   }, [formSubmitted]);
 
   useEffect(() => {
-    if (formSubmitted) {
-      toast({
-        title: "Siden er udgivet!",
-        description:
-          "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
-      });
-    }
-  }, [formSubmitted, toast]);
-
-  useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from("ib-product-cards_v2")
@@ -168,6 +158,10 @@ export default function ProductForm({
           .update(insertData)
           .match({ id: selectedPage.id });
 
+        toast({
+          title: "Siden er opdateret!",
+          description: "Din side er er nu opdateret med ny data",
+        });
         if (updateError) {
           throw updateError;
         }
@@ -176,7 +170,11 @@ export default function ProductForm({
         const { error: insertError } = await supabase
           .from("ib-product-cards_v2")
           .insert([insertData]);
-
+        toast({
+          title: "Siden er udgivet!",
+          description:
+            "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
+        });
         if (insertError) {
           throw insertError;
         }

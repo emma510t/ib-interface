@@ -43,16 +43,6 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
   }, [formSubmitted]);
 
   useEffect(() => {
-    if (formSubmitted) {
-      toast({
-        title: "Siden er udgivet!",
-        description:
-          "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
-      });
-    }
-  }, [formSubmitted, toast]);
-
-  useEffect(() => {
     const fetchData = async () => {
       if (selectedPage.id !== "new") {
         const { data, error } = await supabase
@@ -104,7 +94,10 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
           .from("ib-cases_v2")
           .update(insertData)
           .match({ id: selectedPage.id });
-
+        toast({
+          title: "Siden er opdateret!",
+          description: "Din side er er nu opdateret med ny data",
+        });
         if (updateError) {
           throw updateError;
         }
@@ -113,6 +106,12 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
         const { error: insertError } = await supabase
           .from("ib-cases_v2")
           .insert([insertData]);
+
+        toast({
+          title: "Siden er udgivet!",
+          description:
+            "Din side er er nu tilføjet til improve-business-rettelser.vercel.app",
+        });
 
         if (insertError) {
           throw insertError;
