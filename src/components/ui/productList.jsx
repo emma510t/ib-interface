@@ -27,8 +27,12 @@ async function fetchData() {
   return data;
 }
 
-export default function ProductList({ setSelectedPage, selectedPage }) {
-  const [productCards, setProductCards] = useState([]);
+export default function ProductList({
+  setSelectedPage,
+  selectedPage,
+  productCards,
+  setProductCards,
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { toast } = useToast();

@@ -25,8 +25,12 @@ async function fetchCases() {
   return data;
 }
 
-export default function CaseList({ setSelectedPage, selectedPage }) {
-  const [cases, setCases] = useState([]);
+export default function CaseList({
+  setSelectedPage,
+  selectedPage,
+  cases,
+  setCases,
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { toast } = useToast();
@@ -57,7 +61,7 @@ export default function CaseList({ setSelectedPage, selectedPage }) {
 
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
-    setProductCards((o) => o.filter((page) => page.id !== selectedPage.id));
+    setCases((o) => o.filter((page) => page.id !== selectedPage.id));
 
     await supabase
       .from("ib-cases_v2")

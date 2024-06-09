@@ -36,6 +36,8 @@ export default function ProductForm({
   className,
   selectedPage,
   setSelectedPage,
+  productCards,
+  setProductCards,
 }) {
   const {
     register,

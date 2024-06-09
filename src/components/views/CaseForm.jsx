@@ -23,7 +23,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function CaseForm({ className, selectedPage, setSelectedPage }) {
+export default function CaseForm({
+  className,
+  selectedPage,
+  setSelectedPage,
+  cases,
+  setCases,
+}) {
   const {
     register,
     control,
@@ -74,6 +80,10 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
   const onSubmit = async (data) => {
     try {
       setSubmitting(true);
+      setSelectedPage({
+        id: "",
+        type: "",
+      });
 
       const insertData = {
         h1: data.virksomhed,
@@ -127,7 +137,7 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
 
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
-    setProductCards((o) => o.filter((page) => page.id !== selectedPage.id));
+    setCases((o) => o.filter((page) => page.id !== selectedPage.id));
     await supabase
       .from("ib-cases_v2")
       .delete()
@@ -316,7 +326,11 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
               <>
                 <AlertDialog>
                   <AlertDialogTrigger className="h-5 w-5">
-                    <Button disabled={submitting} variant="destructive">
+                    <Button
+                      disabled={submitting}
+                      variant="destructive"
+                      type="button"
+                    >
                       Slet
                     </Button>
                   </AlertDialogTrigger>
