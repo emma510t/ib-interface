@@ -56,15 +56,10 @@ export default function ProductList({ setSelectedPage, selectedPage }) {
     return <div>No data found</div>;
   }
 
-  // const onHandleDeleteConfirm = async (id) => {
-  //   const { error } = await supabase
-  //     .from("ib-product-cards_v2")
-  //     .delete()
-  //     .eq("id", id);
-  // };
-
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
+    setProductCards((o) => o.filter((page) => page.id !== selectedPage.id));
+
     await supabase
       .from("ib-product-cards_v2")
       .delete()

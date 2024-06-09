@@ -191,6 +191,8 @@ export default function ProductForm({
 
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
+    setProductCards((o) => o.filter((page) => page.id !== selectedPage.id));
+
     await supabase
       .from("ib-product-cards_v2")
       .delete()

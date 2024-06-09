@@ -128,6 +128,7 @@ export default function CaseForm({ className, selectedPage, setSelectedPage }) {
 
   const handleDelete = async () => {
     console.log("slet denne", selectedPage.id);
+    setProductCards((o) => o.filter((page) => page.id !== selectedPage.id));
     await supabase
       .from("ib-cases_v2")
       .delete()
